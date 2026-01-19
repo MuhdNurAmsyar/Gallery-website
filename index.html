@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple Gallery</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>Photo Gallery</h1>
+    <p class="subtitle">Click a thumbnail to view — use ← → or Esc to navigate/close</p>
+  </header>
+
+  <main>
+    <section id="gallery" class="gallery" aria-live="polite">
+      <!-- Thumbnails inserted by script -->
+    </section>
+  </main>
+
+  <!-- Modal viewer -->
+  <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Image viewer">
+    <button id="closeBtn" class="lb-close" aria-label="Close viewer">&times;</button>
+    <button id="prevBtn" class="lb-nav lb-prev" aria-label="Previous image">&#x2039;</button>
+    <div class="lb-content">
+      <img id="lightboxImage" src="" alt="" />
+      <p id="lightboxCaption" class="caption"></p>
+    </div>
+    <button id="nextBtn" class="lb-nav lb-next" aria-label="Next image">&#x203A;</button>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
