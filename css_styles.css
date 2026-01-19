@@ -1,4 +1,4 @@
-/* Simple gallery styles */
+/* Simple gallery styles (updated hover/focus glow) */
 :root{
   --gap: 12px;
   --bg: #111;
@@ -45,13 +45,81 @@ body{
   display:block;
   position:relative;
   cursor:pointer;
-  transition:transform .15s ease, box-shadow .15s ease;
+  transition:transform .18s cubic-bezier(.2,.9,.3,1), box-shadow .18s ease, filter .18s ease, border-color .18s ease;
+  will-change:transform, box-shadow, filter;
+  border:1px solid transparent; /* subtle border for focus glow */
+  outline: none; /* manage focus styles manually */
 }
 .card img{
   width:100%;
   height:160px;
   object-fit:cover;
   display:block;
+}
+
+/* Image "light up" on hover / focus */
+.card{
+  background:var(--card);
+  border-radius:8px;
+  overflow:hidden;                /* keeps rounded corners */
+  display:block;
+  position:relative;
+  cursor:pointer;
+  border:1px solid transparent;
+  transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+/* Image transition for smooth brightness & scale */
+.card img{
+  width:100%;
+  height:160px;
+  object-fit:cover;
+  display:block;
+  transition: transform .22s cubic-bezier(.2,.9,.3,1), filter .18s ease;
+  will-change: transform, filter;
+  transform-origin: center center;
+}
+
+/* Hover / focus: brighten and slightly zoom the image */
+.card:hover img,
+.card:focus img,
+.card:focus-visible img{
+  filter: brightness(1.18) saturate(1.08) contrast(1.03);
+  transform: scale(1.04);
+}
+
+/* Glow around the card for the "lighting" effect */
+.card::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  box-shadow: 0 0 0 0 rgba(6,182,212,0);
+  transition: box-shadow .18s ease;
+}
+
+.card:hover::after,
+.card:focus::after,
+.card:focus-visible::after{
+  /* tweak color/size to taste */
+  box-shadow: 0 0 30px 8px rgba(6,182,212,0.06);
+  border: 0;
+  /* optional stronger glow:
+     box-shadow: 0 8px 40px rgba(6,182,212,0.12), 0 0 28px rgba(6,182,212,0.06);
+  */
+}
+
+/* Keep accessible keyboard focus visible */
+.card:focus-visible{
+  outline: none;
+  box-shadow: 0 10px 24px rgba(2,6,23,.6), 0 0 30px rgba(6,182,212,0.12);
+  border-color: rgba(6,182,212,0.12);
+}
+
+/* For small screens reduce image height slightly */
+@media (max-width:420px){
+  .card img{height:120px}
 }
 .card .meta{
   padding:8px;
@@ -61,7 +129,36 @@ body{
   justify-content:space-between;
   align-items:center;
 }
-.card:hover{transform:translateY(-4px); box-shadow:0 6px 18px rgba(2,6,23,.55)}
+
+/* Glow effect using pseudo-element (keeps image edges crisp) */
+.card::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  box-shadow: 0 0 0 0 rgba(6,182,212,0);
+  transition: box-shadow .18s ease;
+}
+
+/* Hover + keyboard focus styles: light-up + slight lift */
+.card:hover,
+.card:focus,
+.card:focus-visible{
+  transform: translateY(-6px) scale(1.02);
+  filter: brightness(1.06) saturate(1.05);
+  box-shadow: 0 14px 30px rgba(2,6,23,.65), 0 0 20px rgba(6,182,212,0.08);
+  border-color: rgba(6,182,212,0.12);
+}
+.card:hover::after,
+.card:focus::after,
+.card:focus-visible::after{
+  box-shadow: 0 0 30px 8px rgba(6,182,212,0.06);
+}
+
+/* Subtle hover on the meta area as well */
+.card .meta span{transition:opacity .12s}
+.card:hover .meta span{opacity:0.95}
 
 /* Lightbox / modal */
 .lightbox{
@@ -115,4 +212,10 @@ body{
 /* Responsive thumbnail height */
 @media (max-width:420px){
   .card img{height:120px}
+}
+
+/* Accessibility: visible keyboard focus ring for those using keyboard */
+.card:focus-visible{
+  box-shadow: 0 10px 24px rgba(2,6,23,.6), 0 0 30px rgba(6,182,212,0.12);
+  border-color: rgba(6,182,212,0.18);
 }

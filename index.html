@@ -3,22 +3,241 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Simple Gallery</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <title>Gallery — Paste to show photos</title>
+  <style>
+/* Simple gallery styles (updated hover/focus glow) */
+:root{
+  --gap: 12px;
+  --bg: #111;
+  --card: #0f1720;
+  --accent: #06b6d4;
+  --text: #e6eef3;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+  background:linear-gradient(180deg,#07121a 0%, #0b2230 100%);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  padding:24px;
+}
+
+/* Header */
+.site-header{
+  text-align:center;
+  margin-bottom:18px;
+}
+.site-header h1{margin:.25rem 0}
+.subtitle{opacity:.8;margin:0;font-size:.95rem}
+
+/* Gallery grid */
+.gallery{
+  display:grid;
+  gap:var(--gap);
+  grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+  align-items:start;
+  max-width:1100px;
+  margin: 0 auto;
+}
+
+/* Thumbnail card */
+.card{
+  background:var(--card);
+  border-radius:8px;
+  overflow:hidden;
+  display:block;
+  position:relative;
+  cursor:pointer;
+  transition:transform .18s cubic-bezier(.2,.9,.3,1), box-shadow .18s ease, filter .18s ease, border-color .18s ease;
+  will-change:transform, box-shadow, filter;
+  border:1px solid transparent; /* subtle border for focus glow */
+  outline: none; /* manage focus styles manually */
+}
+.card img{
+  width:100%;
+  height:160px;
+  object-fit:cover;
+  display:block;
+}
+
+/* Image "light up" on hover / focus */
+.card{
+  background:var(--card);
+  border-radius:8px;
+  overflow:hidden;                /* keeps rounded corners */
+  display:block;
+  position:relative;
+  cursor:pointer;
+  border:1px solid transparent;
+  transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+/* Image transition for smooth brightness & scale */
+.card img{
+  width:100%;
+  height:160px;
+  object-fit:cover;
+  display:block;
+  transition: transform .22s cubic-bezier(.2,.9,.3,1), filter .18s ease;
+  will-change: transform, filter;
+  transform-origin: center center;
+}
+
+/* Hover / focus: brighten and slightly zoom the image */
+.card:hover img,
+.card:focus img,
+.card:focus-visible img{
+  filter: brightness(1.18) saturate(1.08) contrast(1.03);
+  transform: scale(1.04);
+}
+
+/* Glow around the card for the "lighting" effect */
+.card::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  box-shadow: 0 0 0 0 rgba(6,182,212,0);
+  transition: box-shadow .18s ease;
+}
+
+.card:hover::after,
+.card:focus::after,
+.card:focus-visible::after{
+  /* tweak color/size to taste */
+  box-shadow: 0 0 30px 8px rgba(6,182,212,0.06);
+  border: 0;
+  /* optional stronger glow:
+     box-shadow: 0 8px 40px rgba(6,182,212,0.12), 0 0 28px rgba(6,182,212,0.06);
+  */
+}
+
+/* Keep accessible keyboard focus visible */
+.card:focus-visible{
+  outline: none;
+  box-shadow: 0 10px 24px rgba(2,6,23,.6), 0 0 30px rgba(6,182,212,0.12);
+  border-color: rgba(6,182,212,0.12);
+}
+
+/* For small screens reduce image height slightly */
+@media (max-width:420px){
+  .card img{height:120px}
+}
+.card .meta{
+  padding:8px;
+  font-size:.9rem;
+  color:var(--text);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* Glow effect using pseudo-element (keeps image edges crisp) */
+.card::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  box-shadow: 0 0 0 0 rgba(6,182,212,0);
+  transition: box-shadow .18s ease;
+}
+
+/* Hover + keyboard focus styles: light-up + slight lift */
+.card:hover,
+.card:focus,
+.card:focus-visible{
+  transform: translateY(-6px) scale(1.02);
+  filter: brightness(1.06) saturate(1.05);
+  box-shadow: 0 14px 30px rgba(2,6,23,.65), 0 0 20px rgba(6,182,212,0.08);
+  border-color: rgba(6,182,212,0.12);
+}
+.card:hover::after,
+.card:focus::after,
+.card:focus-visible::after{
+  box-shadow: 0 0 30px 8px rgba(6,182,212,0.06);
+}
+
+/* Subtle hover on the meta area as well */
+.card .meta span{transition:opacity .12s}
+.card:hover .meta span{opacity:0.95}
+
+/* Lightbox / modal */
+.lightbox{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  background:rgba(2,6,23,.85);
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+.lightbox[aria-hidden="false"]{display:flex}
+
+.lb-content{
+  max-width:95%;
+  max-height:90%;
+  text-align:center;
+}
+.lb-content img{
+  max-width:90vw;
+  max-height:75vh;
+  border-radius:6px;
+  box-shadow:0 10px 30px rgba(0,0,0,.7);
+  display:block;
+  margin:0 auto;
+}
+.caption{
+  margin-top:8px;
+  color:#cfeff7;
+  opacity:.9;
+}
+
+/* Nav buttons */
+.lb-nav, .lb-close{
+  position:fixed;
+  background:transparent;
+  color:var(--text);
+  border:0;
+  font-size:36px;
+  cursor:pointer;
+  padding:12px;
+  line-height:1;
+  transition:color .12s;
+}
+.lb-close{top:18px; right:24px; font-size:32px}
+.lb-nav:hover, .lb-close:hover{color:var(--accent)}
+.lb-prev{left:14px; top:50%; transform:translateY(-50%)}
+.lb-next{right:14px; top:50%; transform:translateY(-50%)}
+
+/* Responsive thumbnail height */
+@media (max-width:420px){
+  .card img{height:120px}
+}
+
+/* Accessibility: visible keyboard focus ring for those using keyboard */
+.card:focus-visible{
+  box-shadow: 0 10px 24px rgba(2,6,23,.6), 0 0 30px rgba(6,182,212,0.12);
+  border-color: rgba(6,182,212,0.18);
+}
+  </style>
 </head>
 <body>
   <header class="site-header">
-    <h1>Photo Gallery</h1>
-    <p class="subtitle">Click a thumbnail to view — use ← → or Esc to navigate/close</p>
+    <h1>My Gallery</h1>
+    <p style="opacity:.85">Click a thumbnail to view, use ← → or Esc to navigate/close</p>
   </header>
 
   <main>
-    <section id="gallery" class="gallery" aria-live="polite">
-      <!-- Thumbnails inserted by script -->
-    </section>
+    <section id="gallery" class="gallery" aria-live="polite"></section>
   </main>
 
-  <!-- Modal viewer -->
   <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Image viewer">
     <button id="closeBtn" class="lb-close" aria-label="Close viewer">&times;</button>
     <button id="prevBtn" class="lb-nav lb-prev" aria-label="Previous image">&#x2039;</button>
@@ -29,6 +248,96 @@
     <button id="nextBtn" class="lb-nav lb-next" aria-label="Next image">&#x203A;</button>
   </div>
 
-  <script src="js/script.js"></script>
+  <script>
+    // --- CONFIG: put your filenames here (files must be in images/ folder) ---
+    const images = [
+      "bird.jpg",
+      "Deer.jpg",
+      "hippopotamus.jpg",
+      "raccoon.jpg",
+      "wolf.jpg",
+      "zebra.jpg"
+    ];
+    // ----------------------------------------------------------------------
+
+    const IMAGE_BASE = 'images/'; // folder where images are stored
+    let currentIndex = -1;
+
+    const galleryEl = document.getElementById('gallery');
+    const lightbox = document.getElementById('lightbox');
+    const lbImage = document.getElementById('lightboxImage');
+    const lbCaption = document.getElementById('lightboxCaption');
+    const closeBtn = document.getElementById('closeBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function buildGallery(){
+      galleryEl.innerHTML = '';
+      if(images.length === 0){
+        galleryEl.innerHTML = '<p style="text-align:center;opacity:.8">No images. Add files to the images/ folder and update the images array.</p>';
+        return;
+      }
+      images.forEach((name, idx) => {
+        const card = document.createElement('button');
+        card.className = 'card';
+        card.type = 'button';
+        card.setAttribute('aria-label', `Open ${name}`);
+        card.addEventListener('click', () => openLightbox(idx));
+
+        const img = document.createElement('img');
+        img.src = IMAGE_BASE + name;
+        img.alt = name;
+        img.loading = 'lazy';
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.innerHTML = '<span>' + name + '</span><span style="opacity:.8">' + (idx+1) + '/' + images.length + '</span>';
+
+        card.appendChild(img);
+        card.appendChild(meta);
+        galleryEl.appendChild(card);
+      });
+    }
+
+    function openLightbox(index){
+      if(index < 0 || index >= images.length) return;
+      currentIndex = index;
+      const src = IMAGE_BASE + images[index];
+      lbImage.src = src;
+      lbImage.alt = images[index];
+      lbCaption.textContent = images[index];
+      lightbox.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox(){
+      lightbox.setAttribute('aria-hidden','true');
+      lbImage.src = '';
+      document.body.style.overflow = '';
+      currentIndex = -1;
+    }
+
+    function showNext(dir = 1){
+      if(images.length === 0) return;
+      currentIndex = (currentIndex + dir + images.length) % images.length;
+      openLightbox(currentIndex);
+    }
+
+    // events
+    closeBtn.addEventListener('click', closeLightbox);
+    prevBtn.addEventListener('click', () => showNext(-1));
+    nextBtn.addEventListener('click', () => showNext(1));
+    window.addEventListener('keydown', (e) => {
+      if(lightbox.getAttribute('aria-hidden') === 'false'){
+        if(e.key === 'Escape') closeLightbox();
+        if(e.key === 'ArrowLeft') showNext(-1);
+        if(e.key === 'ArrowRight') showNext(1);
+      }
+    });
+    lightbox.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); });
+
+    // init
+    buildGallery();
+  </script>
 </body>
 </html>

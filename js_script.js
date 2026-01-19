@@ -39,6 +39,10 @@ function buildGallery(){
     return;
   }
 
+  function stripExtension(filename){
+  return filename.replace(/\.[^/.]+$/i, '');
+}
+
   images.forEach((name, idx) => {
     const card = document.createElement('button');
     card.className = 'card';
@@ -48,7 +52,7 @@ function buildGallery(){
 
     const img = document.createElement('img');
     img.src = IMAGE_BASE + name;
-    img.alt = name;
+    img.alt = display;
     img.loading = 'lazy';
 
     const meta = document.createElement('div');
