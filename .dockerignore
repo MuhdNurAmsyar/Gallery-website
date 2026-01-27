@@ -1,0 +1,30 @@
+# ---
+# The Voices In My Head Media Group - Docker Ignore
+# Made with a redbull fueled rage by Muhammad Harith
+# Version 0.1.0 - 2026-01-26
+# ---
+
+# Don't copy test files into production image
+tests/
+test/
+*.test.js
+*.spec.js
+
+# No CI/CD configs in the image
+Jenkinsfile
+.git/
+.github/
+.gitignore
+
+# No documentation in the image
+README.md
+*.md
+docs/
+
+# No local dev shit
+node_modules/
+.vscode/
+.idea/
+*.log
+.DS_Store
+Thumbs.db

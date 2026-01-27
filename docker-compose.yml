@@ -1,0 +1,33 @@
+# ---
+# The Voices In My Head Media Group - Docker Compose
+# Made with a redbull fueled rage by Muhammad Harith
+# Version 0.1.0 - 2026-01-26
+# ---
+
+version: '3.8'
+
+services:
+  gallery-web:
+    container_name: gallery-website
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gallery-website:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    networks:
+      - gallery-network
+    labels:
+      - "com.kazlabs.description=Gallery Website"
+      - "com.kazlabs.version=0.1.0"
+
+networks:
+  gallery-network:
+    driver: bridge
