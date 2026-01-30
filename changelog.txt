@@ -1,3 +1,7 @@
+-0.1.2- Change 2026-01-27T01:00:00Z -
+? : fixed .github/workflows/ci-cd-pipeline.yml (security-scan:106-107) - Added security-events write permission to fix SARIF upload error
+? : fixed .github/workflows/ci-cd-pipeline.yml (upload-sarif:131) - Added continue-on-error to prevent pipeline blocking on upload failures
+
 -0.1.1- Change 2026-01-27T00:00:00Z -
 + : added .github/workflows/ci-cd-pipeline.yml - Implemented GitHub Actions CI/CD pipeline to replace Jenkins
 + : added changelog.txt - Track all project changes as per project standards
