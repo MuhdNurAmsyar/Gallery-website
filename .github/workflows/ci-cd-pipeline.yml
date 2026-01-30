@@ -1,0 +1,219 @@
+# ---
+# The Voices In My Head Media Group - GitHub Actions CI/CD Pipeline
+# Made with a redbull fueled rage by Muhammad Harith
+# Version 0.1.0 - 2026-01-27
+# ---
+
+name: Gallery Website CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: gallery-website
+  REGISTRY: ghcr.io
+  NODE_VERSION: '18'
+
+jobs:
+  # Job 1: Run tests to validate the gallery structure
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Run gallery validation tests
+        run: |
+          echo "[$(date -Iseconds)] [TestRunner] [INFO] Starting test execution"
+          npm test
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            tests/
+            *.log
+          retention-days: 7
+
+  # Job 2: Build and validate Docker image
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build Docker image
+        run: |
+          echo "[$(date -Iseconds)] [DockerBuild] [INFO] Building Docker image"
+          docker build -t ${{ env.IMAGE_NAME }}:latest .
+      
+      - name: Test Docker image
+        run: |
+          echo "[$(date -Iseconds)] [DockerTest] [INFO] Starting container for validation"
+          docker run -d --name test-container -p 8080:80 ${{ env.IMAGE_NAME }}:latest
+          sleep 5
+          
+          echo "[$(date -Iseconds)] [DockerTest] [INFO] Testing health endpoint"
+          curl -f http://localhost:8080/health || exit 1
+          
+          echo "[$(date -Iseconds)] [DockerTest] [INFO] Testing main page"
+          curl -f http://localhost:8080/ || exit 1
+          
+          docker stop test-container
+          docker rm test-container
+          echo "[$(date -Iseconds)] [DockerTest] [INFO] Container validation successful"
+      
+      - name: Save Docker image as artifact
+        run: |
+          docker save ${{ env.IMAGE_NAME }}:latest | gzip > gallery-website-image.tar.gz
+      
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: gallery-website-image.tar.gz
+          retention-days: 7
+
+  # Job 3: Security scan the Docker image
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+      
+      - name: Load Docker image
+        run: |
+          docker load < gallery-website-image.tar.gz
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}:latest
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+      
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Job 4: Push to GitHub Container Registry (only on main/master)
+  push-registry:
+    name: Push to Registry
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+      
+      - name: Load Docker image
+        run: |
+          docker load < gallery-website-image.tar.gz
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+      
+      - name: Tag and push Docker image
+        run: |
+          echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging image for registry"
+          
+          for tag in ${{ steps.meta.outputs.tags }}; do
+            echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging as $tag"
+            docker tag ${{ env.IMAGE_NAME }}:latest $tag
+            
+            echo "[$(date -Iseconds)] [RegistryPush] [INFO] Pushing $tag"
+            docker push $tag
+          done
+          
+          echo "[$(date -Iseconds)] [RegistryPush] [INFO] Push completed successfully"
+
+  # Job 5: Deploy (placeholder - customize based on your deployment target)
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    needs: push-registry
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Deploy notification
+        run: |
+          echo "[$(date -Iseconds)] [Deploy] [INFO] Deployment stage triggered"
+          echo "[$(date -Iseconds)] [Deploy] [INFO] Image available at: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest"
+          echo "[$(date -Iseconds)] [Deploy] [INFO] Configure your deployment target to pull this image"
+          
+          # TODO: Add actual deployment steps here
+          # Examples:
+          # - SSH to server and run docker-compose pull && docker-compose up -d
+          # - Update Kubernetes deployment
+          # - Deploy to cloud provider (AWS ECS, Azure Container Instances, etc.)
+          # - Use GitHub Pages for static hosting
+      
+      - name: Deployment summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Status**: Pipeline completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "📦 **Image**: \`${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "👤 **Triggered by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,8 @@
+-0.1.1- Change 2026-01-27T00:00:00Z -
++ : added .github/workflows/ci-cd-pipeline.yml - Implemented GitHub Actions CI/CD pipeline to replace Jenkins
++ : added changelog.txt - Track all project changes as per project standards
++ : added IMPLEMENTATION-GUIDE.md - Comprehensive step-by-step guide for setting up and deploying the CI/CD pipeline
++ : added QUICK-START.md - Fast reference guide for getting started in 5 minutes
++ : added PROJECT-SUMMARY.md - Complete project overview for academic presentation and documentation
+? : updated README.md - Comprehensive documentation for CI/CD pipeline, deployment options, and troubleshooting
+? : migrated from Jenkins to GitHub Actions - Better integration, easier maintenance, no XML hell
