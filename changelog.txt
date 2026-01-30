@@ -1,3 +1,7 @@
+-0.1.3- Change 2026-01-27T02:00:00Z -
+? : fixed .github/workflows/ci-cd-pipeline.yml (push-registry:164-196) - Fixed bash syntax error in tag loop, replaced with explicit tagging
+? : fixed .github/workflows/ci-cd-pipeline.yml (push-registry:164-196) - Removed docker/metadata-action to avoid newline parsing issues
+
 -0.1.2- Change 2026-01-27T01:00:00Z -
 ? : fixed .github/workflows/ci-cd-pipeline.yml (security-scan:106-107) - Added security-events write permission to fix SARIF upload error
 ? : fixed .github/workflows/ci-cd-pipeline.yml (upload-sarif:131) - Added continue-on-error to prevent pipeline blocking on upload failures

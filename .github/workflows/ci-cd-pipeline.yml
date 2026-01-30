@@ -165,27 +165,32 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
-      
       - name: Tag and push Docker image
         run: |
-          echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging image for registry"
+          echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging and pushing image for registry"
           
-          for tag in ${{ steps.meta.outputs.tags }}; do
-            echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging as $tag"
-            docker tag ${{ env.IMAGE_NAME }}:latest $tag
-            
-            echo "[$(date -Iseconds)] [RegistryPush] [INFO] Pushing $tag"
-            docker push $tag
-          done
+          # Define image base name
+          IMAGE_BASE="${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}"
+          
+          # Tag with branch name
+          BRANCH_TAG="${IMAGE_BASE}:${{ github.ref_name }}"
+          echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging as $BRANCH_TAG"
+          docker tag ${{ env.IMAGE_NAME }}:latest "$BRANCH_TAG"
+          docker push "$BRANCH_TAG"
+          
+          # Tag with commit SHA
+          SHA_TAG="${IMAGE_BASE}:${{ github.ref_name }}-${{ github.sha }}"
+          echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging as $SHA_TAG"
+          docker tag ${{ env.IMAGE_NAME }}:latest "$SHA_TAG"
+          docker push "$SHA_TAG"
+          
+          # Tag as latest (only if on default branch)
+          if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            LATEST_TAG="${IMAGE_BASE}:latest"
+            echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging as $LATEST_TAG"
+            docker tag ${{ env.IMAGE_NAME }}:latest "$LATEST_TAG"
+            docker push "$LATEST_TAG"
+          fi
           
           echo "[$(date -Iseconds)] [RegistryPush] [INFO] Push completed successfully"
 
