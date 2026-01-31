@@ -226,6 +226,57 @@ body{
   box-shadow: 0 10px 24px rgba(2,6,23,.6), 0 0 30px rgba(6,182,212,0.12);
   border-color: rgba(6,182,212,0.18);
 }
+
+/* Easter Egg Button - floating on the right side */
+.easter-egg-btn{
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 48px;
+  height: 48px;
+  background: var(--card);
+  border: 1px solid rgba(6,182,212,0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  color: var(--accent);
+  transition: all .2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.easter-egg-btn:hover{
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: 0 6px 20px rgba(6,182,212,.3);
+  border-color: var(--accent);
+}
+.easter-egg-btn:active{
+  transform: scale(0.95);
+}
+
+/* Toast notification for button clicks */
+.toast{
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--card);
+  color: var(--text);
+  padding: 12px 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(6,182,212,0.3);
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+  z-index: 1001;
+  opacity: 0;
+  transform: translateX(400px);
+  transition: all .3s cubic-bezier(.2,.9,.3,1);
+  max-width: 300px;
+}
+.toast.show{
+  opacity: 1;
+  transform: translateX(0);
+}
   </style>
 </head>
 <body>
@@ -238,6 +289,10 @@ body{
     <section id="gallery" class="gallery" aria-live="polite"></section>
   </main>
 
+  <footer style="text-align:center; padding:24px 0; margin-top:48px; opacity:.6; font-size:.9rem">
+    Made with ♥ by Muhammad Harith
+  </footer>
+
   <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Image viewer">
     <button id="closeBtn" class="lb-close" aria-label="Close viewer">&times;</button>
     <button id="prevBtn" class="lb-nav lb-prev" aria-label="Previous image">&#x2039;</button>
@@ -247,6 +302,17 @@ body{
     </div>
     <button id="nextBtn" class="lb-nav lb-next" aria-label="Next image">&#x203A;</button>
   </div>
+
+  <!-- Easter Egg Button -->
+  <button id="easterEggBtn" class="easter-egg-btn" aria-label="Mystery button" title="Click me... if you dare">
+    ?
+  </button>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Easter Egg just above final html tag -->
+  <easter-egg="Harith was here 2026"></easter-egg>
 
   <script>
     // --- CONFIG: put your filenames here (files must be in images/ folder) ---
@@ -338,6 +404,42 @@ body{
 
     // init
     buildGallery();
+
+    // Easter Egg Button Logic
+    const easterEggBtn = document.getElementById('easterEggBtn');
+    const toast = document.getElementById('toast');
+    
+    const messages = [
+      "You clicked a button that does literally nothing. Congrats.",
+      "Still here? This button has no purpose.",
+      "Why do you keep clicking? There's no reward.",
+      "This is a test feature. It's testing your patience.",
+      "Fun fact: This button was made to test CI/CD pipelines.",
+      "Another click, another disappointment.",
+      "At least the animation is smooth, right?",
+      "The pipeline works! This button? Not so much.",
+      "Made with a concerning amount of caffeine ☕",
+      "Harith was here. Now you're here. We're all here."
+    ];
+    
+    let clickCount = 0;
+    
+    function showToast(message){
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+    
+    easterEggBtn.addEventListener('click', () => {
+      clickCount++;
+      const message = messages[Math.floor(Math.random() * messages.length)];
+      showToast(message);
+      
+      // Log to console for the curious
+      console.log(`[$(date -Iseconds)] [EasterEgg] [INFO] Button clicked ${clickCount} time(s) - User has too much free time`);
+    });
   </script>
 </body>
 </html>

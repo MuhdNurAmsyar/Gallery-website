@@ -1,3 +1,9 @@
+-0.1.5- Change 2026-01-31T14:00:00Z -
++ : added FEATURE-EASTER-EGG.md - Documentation for easter egg button feature and pipeline testing strategy
++ : added index.html (lines 230-276) - Added easter egg button feature for pipeline testing purposes
+? : updated index.html (footer) - Added proper footer with attribution as per project standards
+? : updated index.html (easter-egg tag) - Added easter egg HTML comment tag before closing html
+
 -0.1.4- Change 2026-01-31T12:00:00Z -
 + : added BUGFIX-SUMMARY.md - Comprehensive documentation of CI/CD pipeline fixes for registry and security scan issues
 ? : fixed .github/workflows/ci-cd-pipeline.yml (security-scan:108) - Added actions:read permission to fix artifact download permission errors
