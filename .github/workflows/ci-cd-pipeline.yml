@@ -106,6 +106,7 @@ jobs:
     permissions:
       contents: read
       security-events: write
+      actions: read
     
     steps:
       - name: Checkout code
@@ -169,8 +170,9 @@ jobs:
         run: |
           echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging and pushing image for registry"
           
-          # Define image base name
-          IMAGE_BASE="${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}"
+          # Define image base name with lowercase repository owner (GitHub Container Registry requirement)
+          REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_BASE="${{ env.REGISTRY }}/${REPO_OWNER_LOWER}/${{ env.IMAGE_NAME }}"
           
           # Tag with branch name
           BRANCH_TAG="${IMAGE_BASE}:${{ github.ref_name }}"
@@ -208,7 +210,8 @@ jobs:
       - name: Deploy notification
         run: |
           echo "[$(date -Iseconds)] [Deploy] [INFO] Deployment stage triggered"
-          echo "[$(date -Iseconds)] [Deploy] [INFO] Image available at: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest"
+          REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "[$(date -Iseconds)] [Deploy] [INFO] Image available at: ${{ env.REGISTRY }}/${REPO_OWNER_LOWER}/${{ env.IMAGE_NAME }}:latest"
           echo "[$(date -Iseconds)] [Deploy] [INFO] Configure your deployment target to pull this image"
           
           # TODO: Add actual deployment steps here
@@ -220,9 +223,10 @@ jobs:
       
       - name: Deployment summary
         run: |
+          REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "✅ **Status**: Pipeline completed successfully" >> $GITHUB_STEP_SUMMARY
-          echo "📦 **Image**: \`${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "📦 **Image**: \`${{ env.REGISTRY }}/${REPO_OWNER_LOWER}/${{ env.IMAGE_NAME }}:latest\`" >> $GITHUB_STEP_SUMMARY
           echo "🔗 **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "👤 **Triggered by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
