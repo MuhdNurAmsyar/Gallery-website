@@ -1,3 +1,22 @@
+-0.1.9- Change 2026-02-02T20:00:00Z -
++ : added DEMO-COMMANDS.md - Comprehensive demo command reference for presentation with all functionalities covered (Docker, tests, pipeline, compose) - 600+ lines
++ : added demo-presentation.ps1 - Automated PowerShell script to run full demo sequence with pauses and verification - 250+ lines with error handling
++ : added QUICK-REFERENCE-CARD.md - Condensed quick reference card for easy access during presentation - one-page cheat sheet
++ : added PRESENTATION-CHECKLIST.md - Complete pre-presentation checklist with timeline, Q&A prep, and troubleshooting - comprehensive preparation guide
++ : added DEMO-PREP-SUMMARY.md - Meta-document explaining all demo resources and how to use them - overview of preparation materials
++ : added README-DEMO.md - Lecturer-facing document explaining all demo resources and evaluation criteria coverage
++ : added LAST-MINUTE-CHEATSHEET.txt - Ultra-condensed text file for final review right before presenting
+? : updated README.md (Demo Resources section) - Added documentation for new demo resources and automated demo script usage with command examples
+? : updated changelog.txt - Documented all demo resource additions for version 0.1.9 (7 new files created)
+
+-0.1.8- Change 2026-02-02T02:00:00Z -
++ : added CODE-DOCUMENTATION-SUMMARY.md - Comprehensive summary of code documentation effort (625+ comments added)
+? : updated index.html (all lines) - Added detailed inline comments explaining every line of code (~350 comments)
+? : updated js_script.js (all lines) - Added detailed inline comments explaining every line of code (~75 comments)
+? : updated tests/test-gallery.js (all lines) - Added detailed inline comments explaining every line of code (~120 comments)
+? : updated Dockerfile (all lines) - Added detailed inline comments explaining every Docker command and configuration (~55 comments)
+? : updated docker-compose.yml (all lines) - Added detailed inline comments explaining every Docker Compose configuration (~25 comments)
+
 -0.1.7- Change 2026-02-02T01:30:00Z -
 + : added images.json.info - Documentation file with developer attribution for images.json (Amsyar)
 ? : updated index.html (header comment:1-4) - Added developer attribution comment for Amsyar

@@ -6,29 +6,38 @@
 # ---
 
 version: '3.8'
+# Specifies Docker Compose file version (3.8 for modern features)
+# Note: This attribute is now obsolete in newer Docker Compose but kept for compatibility
 
 services:
+  # Defines services (containers) that make up the application
   gallery-web:
-    container_name: gallery-website
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # Name of the service (used for DNS and service discovery)
+    build: .
+    # Builds image from Dockerfile in current directory
+    # Shorthand for: build: context: .
     image: gallery-website:latest
+    # Tags the built image with this name and tag
+    container_name: gallery-website
+    # Sets specific container name (instead of auto-generated)
     ports:
+      # Maps ports between host and container
       - "8080:80"
+      # Format: "HOST_PORT:CONTAINER_PORT"
+      # Maps host port 8080 to container port 80
     restart: unless-stopped
+    # Restart policy: restarts container unless explicitly stopped
+    # Options: no, always, on-failure, unless-stopped
     healthcheck:
+      # Defines health check configuration for this container
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      # Health check command as array (prevents shell injection)
+      # Tests if /health endpoint responds
       interval: 30s
+      # Runs health check every 30 seconds
       timeout: 3s
+      # Fails check if it takes longer than 3 seconds
       retries: 3
+      # Marks container unhealthy after 3 consecutive failures
       start_period: 5s
-    networks:
-      - gallery-network
-    labels:
-      - "com.kazlabs.description=Gallery Website"
-      - "com.kazlabs.version=0.1.0"
-
-networks:
-  gallery-network:
-    driver: bridge
+      # Gives container 5 seconds to start before running health checks

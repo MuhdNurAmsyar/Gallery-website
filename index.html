@@ -2,487 +2,487 @@
   Main Web Application - Gallery Website
   Developer: Amsyar
 -->
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Gallery</title>
-  <style>
+<!doctype html> <!-- HTML5 doctype declaration for modern standards -->
+<html lang="en"> <!-- Root HTML element with English language attribute -->
+<head> <!-- Contains metadata and resources for the page -->
+  <meta charset="utf-8" /> <!-- Sets character encoding to UTF-8 for proper text display -->
+  <meta name="viewport" content="width=device-width,initial-scale=1" /> <!-- Makes the page responsive on mobile devices -->
+  <title>Gallery</title> <!-- Sets the browser tab title -->
+  <style> <!-- Inline CSS styles for the entire page -->
 /* Simple gallery styles (updated hover/focus glow) */
-:root{
-  --gap: 12px;
-  --bg: #111;
-  --card: #0f1720;
-  --accent: #06b6d4;
-  --text: #e6eef3;
+:root{ /* Root element for CSS custom properties (variables) */
+  --gap: 12px; /* Defines spacing between gallery items */
+  --bg: #111; /* Dark background color variable */
+  --card: #0f1720; /* Card background color (dark blue-gray) */
+  --accent: #06b6d4; /* Accent color (cyan) for highlights */
+  --text: #e6eef3; /* Light text color for readability */
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
-  background:linear-gradient(180deg,#07121a 0%, #0b2230 100%);
-  color:var(--text);
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  padding:24px;
+*{box-sizing:border-box} /* Makes all elements include padding/border in their width/height */
+html,body{height:100%} /* Sets html and body to take full viewport height */
+body{ /* Styles for the main body element */
+  margin:0; /* Removes default browser margins */
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; /* Uses system fonts for best performance */
+  background:linear-gradient(180deg,#07121a 0%, #0b2230 100%); /* Creates a dark gradient background */
+  color:var(--text); /* Sets default text color using CSS variable */
+  -webkit-font-smoothing:antialiased; /* Smooths fonts on WebKit browsers (Safari, Chrome) */
+  -moz-osx-font-smoothing:grayscale; /* Smooths fonts on Firefox */
+  padding:24px; /* Adds space around the entire page content */
 }
 
 /* Header */
-.site-header{
-  text-align:center;
-  margin-bottom:18px;
+.site-header{ /* Styles for the main header section */
+  text-align:center; /* Centers all header content */
+  margin-bottom:18px; /* Adds space below the header */
 }
-.site-header h1{margin:.25rem 0}
-.subtitle{opacity:.8;margin:0;font-size:.95rem}
+.site-header h1{margin:.25rem 0} /* Reduces margin on h1 heading in header */
+.subtitle{opacity:.8;margin:0;font-size:.95rem} /* Styles subtitle with slight transparency and smaller font */
 
 /* Gallery grid */
-.gallery{
-  display:grid;
-  gap:var(--gap);
-  grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
-  align-items:start;
-  max-width:1100px;
-  margin: 0 auto;
+.gallery{ /* Main gallery container styles */
+  display:grid; /* Uses CSS Grid layout for image arrangement */
+  gap:var(--gap); /* Spacing between grid items using CSS variable */
+  grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); /* Creates responsive columns that fit available space */
+  align-items:start; /* Aligns items to the top of their grid cells */
+  max-width:1100px; /* Limits maximum width for better readability */
+  margin: 0 auto; /* Centers the gallery horizontally */
 }
 
 /* Thumbnail card */
-.card{
-  background:var(--card);
-  border-radius:8px;
-  overflow:hidden;
-  display:block;
-  position:relative;
-  cursor:pointer;
-  transition:transform .18s cubic-bezier(.2,.9,.3,1), box-shadow .18s ease, filter .18s ease, border-color .18s ease;
-  will-change:transform, box-shadow, filter;
-  border:1px solid transparent; /* subtle border for focus glow */
-  outline: none; /* manage focus styles manually */
+.card{ /* Individual image card container */
+  background:var(--card); /* Sets card background color */
+  border-radius:8px; /* Rounds the corners of cards */
+  overflow:hidden; /* Clips content that exceeds card boundaries (keeps rounded corners) */
+  display:block; /* Makes card a block-level element */
+  position:relative; /* Establishes positioning context for child elements */
+  cursor:pointer; /* Changes cursor to pointer on hover to indicate clickability */
+  transition:transform .18s cubic-bezier(.2,.9,.3,1), box-shadow .18s ease, filter .18s ease, border-color .18s ease; /* Smooth animations for hover effects */
+  will-change:transform, box-shadow, filter; /* Optimizes performance by hinting which properties will change */
+  border:1px solid transparent; /* Adds transparent border for focus glow effect */
+  outline: none; /* Removes default outline (replaced with custom focus styles) */
 }
-.card img{
-  width:100%;
-  height:160px;
-  object-fit:cover;
-  display:block;
+.card img{ /* Images inside cards */
+  width:100%; /* Makes image fill card width */
+  height:160px; /* Fixed height for consistent card sizes */
+  object-fit:cover; /* Crops image to fill space while maintaining aspect ratio */
+  display:block; /* Removes inline spacing below image */
 }
 
 /* Image "light up" on hover / focus */
-.card{
-  background:var(--card);
-  border-radius:8px;
-  overflow:hidden;                /* keeps rounded corners */
-  display:block;
-  position:relative;
-  cursor:pointer;
-  border:1px solid transparent;
-  transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
+.card{ /* Redefining card for hover effects */
+  background:var(--card); /* Card background color */
+  border-radius:8px; /* Rounded corners */
+  overflow:hidden; /* Keeps content within rounded corners */
+  display:block; /* Block-level display */
+  position:relative; /* Position context for pseudo-elements */
+  cursor:pointer; /* Pointer cursor for interactivity */
+  border:1px solid transparent; /* Border for focus effects */
+  transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease; /* Smooth transitions for hover */
 }
 
 /* Image transition for smooth brightness & scale */
-.card img{
-  width:100%;
-  height:160px;
-  object-fit:cover;
-  display:block;
-  transition: transform .22s cubic-bezier(.2,.9,.3,1), filter .18s ease;
-  will-change: transform, filter;
-  transform-origin: center center;
+.card img{ /* Image hover transition styles */
+  width:100%; /* Full width */
+  height:160px; /* Fixed height */
+  object-fit:cover; /* Maintain aspect ratio while covering space */
+  display:block; /* Block display */
+  transition: transform .22s cubic-bezier(.2,.9,.3,1), filter .18s ease; /* Smooth scale and filter transitions */
+  will-change: transform, filter; /* Performance optimization hint */
+  transform-origin: center center; /* Scale from center point */
 }
 
 /* Hover / focus: brighten and slightly zoom the image */
-.card:hover img,
-.card:focus img,
-.card:focus-visible img{
-  filter: brightness(1.18) saturate(1.08) contrast(1.03);
-  transform: scale(1.04);
+.card:hover img, /* When hovering over card */
+.card:focus img, /* When card has keyboard focus */
+.card:focus-visible img{ /* When card has visible keyboard focus */
+  filter: brightness(1.18) saturate(1.08) contrast(1.03); /* Brightens, saturates, and increases contrast */
+  transform: scale(1.04); /* Slightly enlarges image on hover */
 }
 
 /* Glow around the card for the "lighting" effect */
-.card::after{
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 8px;
-  pointer-events: none;
-  box-shadow: 0 0 0 0 rgba(6,182,212,0);
-  transition: box-shadow .18s ease;
+.card::after{ /* Pseudo-element for glow effect */
+  content: ""; /* Required for pseudo-element to display */
+  position: absolute; /* Positions relative to card */
+  inset: 0; /* Fills entire card area (shorthand for top/right/bottom/left: 0) */
+  border-radius: 8px; /* Matches card border radius */
+  pointer-events: none; /* Prevents pseudo-element from blocking clicks */
+  box-shadow: 0 0 0 0 rgba(6,182,212,0); /* Initial shadow (invisible) */
+  transition: box-shadow .18s ease; /* Smooth shadow transition */
 }
 
-.card:hover::after,
-.card:focus::after,
-.card:focus-visible::after{
+.card:hover::after, /* Glow on hover */
+.card:focus::after, /* Glow on focus */
+.card:focus-visible::after{ /* Glow on visible focus */
   /* tweak color/size to taste */
-  box-shadow: 0 0 30px 8px rgba(6,182,212,0.06);
-  border: 0;
+  box-shadow: 0 0 30px 8px rgba(6,182,212,0.06); /* Creates glowing effect around card */
+  border: 0; /* No border on pseudo-element */
   /* optional stronger glow:
      box-shadow: 0 8px 40px rgba(6,182,212,0.12), 0 0 28px rgba(6,182,212,0.06);
   */
 }
 
 /* Keep accessible keyboard focus visible */
-.card:focus-visible{
-  outline: none;
-  box-shadow: 0 10px 24px rgba(2,6,23,.6), 0 0 30px rgba(6,182,212,0.12);
-  border-color: rgba(6,182,212,0.12);
+.card:focus-visible{ /* Keyboard focus indicator */
+  outline: none; /* Removes default outline */
+  box-shadow: 0 10px 24px rgba(2,6,23,.6), 0 0 30px rgba(6,182,212,0.12); /* Creates custom focus shadow */
+  border-color: rgba(6,182,212,0.12); /* Adds colored border for focus */
 }
 
 /* For small screens reduce image height slightly */
-@media (max-width:420px){
-  .card img{height:120px}
+@media (max-width:420px){ /* Mobile breakpoint media query */
+  .card img{height:120px} /* Reduces image height on small screens */
 }
-.card .meta{
-  padding:8px;
-  font-size:.9rem;
-  color:var(--text);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+.card .meta{ /* Metadata section below images */
+  padding:8px; /* Adds space inside metadata area */
+  font-size:.9rem; /* Slightly smaller font size */
+  color:var(--text); /* Uses text color variable */
+  display:flex; /* Uses flexbox for layout */
+  justify-content:space-between; /* Spaces items apart */
+  align-items:center; /* Vertically centers items */
 }
 
 /* Glow effect using pseudo-element (keeps image edges crisp) */
-.card::after{
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 8px;
-  pointer-events: none;
-  box-shadow: 0 0 0 0 rgba(6,182,212,0);
-  transition: box-shadow .18s ease;
+.card::after{ /* Glow pseudo-element (duplicate definition) */
+  content: ""; /* Required for display */
+  position: absolute; /* Absolute positioning */
+  inset: 0; /* Covers entire card */
+  border-radius: 8px; /* Rounded corners */
+  pointer-events: none; /* Doesn't interfere with clicks */
+  box-shadow: 0 0 0 0 rgba(6,182,212,0); /* Initial invisible shadow */
+  transition: box-shadow .18s ease; /* Smooth transition */
 }
 
 /* Hover + keyboard focus styles: light-up + slight lift */
-.card:hover,
-.card:focus,
-.card:focus-visible{
-  transform: translateY(-6px) scale(1.02);
-  filter: brightness(1.06) saturate(1.05);
-  box-shadow: 0 14px 30px rgba(2,6,23,.65), 0 0 20px rgba(6,182,212,0.08);
-  border-color: rgba(6,182,212,0.12);
+.card:hover, /* Card hover state */
+.card:focus, /* Card focus state */
+.card:focus-visible{ /* Card visible focus state */
+  transform: translateY(-6px) scale(1.02); /* Lifts card up and slightly enlarges */
+  filter: brightness(1.06) saturate(1.05); /* Brightens and saturates colors */
+  box-shadow: 0 14px 30px rgba(2,6,23,.65), 0 0 20px rgba(6,182,212,0.08); /* Creates elevation shadow */
+  border-color: rgba(6,182,212,0.12); /* Adds accent border color */
 }
-.card:hover::after,
-.card:focus::after,
-.card:focus-visible::after{
-  box-shadow: 0 0 30px 8px rgba(6,182,212,0.06);
+.card:hover::after, /* Pseudo-element on hover */
+.card:focus::after, /* Pseudo-element on focus */
+.card:focus-visible::after{ /* Pseudo-element on visible focus */
+  box-shadow: 0 0 30px 8px rgba(6,182,212,0.06); /* Glow effect */
 }
 
 /* Subtle hover on the meta area as well */
-.card .meta span{transition:opacity .12s}
-.card:hover .meta span{opacity:0.95}
+.card .meta span{transition:opacity .12s} /* Smooth opacity transition for metadata text */
+.card:hover .meta span{opacity:0.95} /* Slightly reduces opacity on hover */
 
 /* Lightbox / modal */
-.lightbox{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:1000;
-  background:rgba(2,6,23,.85);
-  align-items:center;
-  justify-content:center;
-  padding:24px;
+.lightbox{ /* Lightbox overlay container */
+  display:none; /* Hidden by default */
+  position:fixed; /* Fixed to viewport (doesn't scroll) */
+  inset:0; /* Covers entire viewport */
+  z-index:1000; /* High z-index to appear above other content */
+  background:rgba(2,6,23,.85); /* Semi-transparent dark background */
+  align-items:center; /* Centers content vertically */
+  justify-content:center; /* Centers content horizontally */
+  padding:24px; /* Padding around content */
 }
-.lightbox[aria-hidden="false"]{display:flex}
+.lightbox[aria-hidden="false"]{display:flex} /* Shows lightbox when aria-hidden is false */
 
-.lb-content{
-  max-width:95%;
-  max-height:90%;
-  text-align:center;
+.lb-content{ /* Lightbox content container */
+  max-width:95%; /* Limits width to 95% of viewport */
+  max-height:90%; /* Limits height to 90% of viewport */
+  text-align:center; /* Centers text content */
 }
-.lb-content img{
-  max-width:90vw;
-  max-height:75vh;
-  border-radius:6px;
-  box-shadow:0 10px 30px rgba(0,0,0,.7);
-  display:block;
-  margin:0 auto;
+.lb-content img{ /* Image inside lightbox */
+  max-width:90vw; /* Maximum 90% of viewport width */
+  max-height:75vh; /* Maximum 75% of viewport height */
+  border-radius:6px; /* Slightly rounded corners */
+  box-shadow:0 10px 30px rgba(0,0,0,.7); /* Drop shadow for depth */
+  display:block; /* Block display */
+  margin:0 auto; /* Centers image horizontally */
 }
-.caption{
-  margin-top:8px;
-  color:#cfeff7;
-  opacity:.9;
+.caption{ /* Image caption in lightbox */
+  margin-top:8px; /* Space above caption */
+  color:#cfeff7; /* Light blue text color */
+  opacity:.9; /* Slightly transparent */
 }
 
 /* Nav buttons */
-.lb-nav, .lb-close{
-  position:fixed;
-  background:transparent;
-  color:var(--text);
-  border:0;
-  font-size:36px;
-  cursor:pointer;
-  padding:12px;
-  line-height:1;
-  transition:color .12s;
+.lb-nav, .lb-close{ /* Navigation and close buttons */
+  position:fixed; /* Fixed to viewport */
+  background:transparent; /* Transparent background */
+  color:var(--text); /* Text color */
+  border:0; /* No border */
+  font-size:36px; /* Large font size for visibility */
+  cursor:pointer; /* Pointer cursor */
+  padding:12px; /* Padding for click area */
+  line-height:1; /* Tight line height */
+  transition:color .12s; /* Smooth color transition */
 }
-.lb-close{top:18px; right:24px; font-size:32px}
-.lb-nav:hover, .lb-close:hover{color:var(--accent)}
-.lb-prev{left:14px; top:50%; transform:translateY(-50%)}
-.lb-next{right:14px; top:50%; transform:translateY(-50%)}
+.lb-close{top:18px; right:24px; font-size:32px} /* Positions close button in top-right */
+.lb-nav:hover, .lb-close:hover{color:var(--accent)} /* Changes color on hover */
+.lb-prev{left:14px; top:50%; transform:translateY(-50%)} /* Positions previous button on left, vertically centered */
+.lb-next{right:14px; top:50%; transform:translateY(-50%)} /* Positions next button on right, vertically centered */
 
 /* Responsive thumbnail height */
-@media (max-width:420px){
-  .card img{height:120px}
+@media (max-width:420px){ /* Mobile breakpoint */
+  .card img{height:120px} /* Reduces card image height on mobile */
 }
 
 /* Accessibility: visible keyboard focus ring for those using keyboard */
-.card:focus-visible{
-  box-shadow: 0 10px 24px rgba(2,6,23,.6), 0 0 30px rgba(6,182,212,0.12);
-  border-color: rgba(6,182,212,0.18);
+.card:focus-visible{ /* Keyboard focus indicator */
+  box-shadow: 0 10px 24px rgba(2,6,23,.6), 0 0 30px rgba(6,182,212,0.12); /* Focus shadow */
+  border-color: rgba(6,182,212,0.18); /* Focus border color */
 }
 
 /* Easter Egg Button - floating on the right side */
-.easter-egg-btn{
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  width: 48px;
-  height: 48px;
-  background: var(--card);
-  border: 1px solid rgba(6,182,212,0.2);
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 20px;
-  color: var(--accent);
-  transition: all .2s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,.3);
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.easter-egg-btn{ /* Easter egg button styles */
+  position: fixed; /* Fixed to viewport */
+  right: 20px; /* 20px from right edge */
+  bottom: 20px; /* 20px from bottom edge */
+  width: 48px; /* Fixed width */
+  height: 48px; /* Fixed height (creates circle) */
+  background: var(--card); /* Card background color */
+  border: 1px solid rgba(6,182,212,0.2); /* Subtle accent border */
+  border-radius: 50%; /* Makes button circular */
+  cursor: pointer; /* Pointer cursor */
+  font-size: 20px; /* Font size for "?" */
+  color: var(--accent); /* Accent color for text */
+  transition: all .2s ease; /* Smooth transition for all properties */
+  box-shadow: 0 4px 12px rgba(0,0,0,.3); /* Drop shadow */
+  z-index: 999; /* High z-index (below lightbox) */
+  display: flex; /* Flexbox for centering */
+  align-items: center; /* Centers content vertically */
+  justify-content: center; /* Centers content horizontally */
 }
-.easter-egg-btn:hover{
-  transform: scale(1.1) rotate(15deg);
-  box-shadow: 0 6px 20px rgba(6,182,212,.3);
-  border-color: var(--accent);
+.easter-egg-btn:hover{ /* Hover state */
+  transform: scale(1.1) rotate(15deg); /* Enlarges and rotates button */
+  box-shadow: 0 6px 20px rgba(6,182,212,.3); /* Enhanced shadow */
+  border-color: var(--accent); /* Brighter border */
 }
-.easter-egg-btn:active{
-  transform: scale(0.95);
+.easter-egg-btn:active{ /* Active/pressed state */
+  transform: scale(0.95); /* Slightly shrinks button */
 }
 
 /* Toast notification for button clicks */
-.toast{
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: var(--card);
-  color: var(--text);
-  padding: 12px 20px;
-  border-radius: 6px;
-  border: 1px solid rgba(6,182,212,0.3);
-  box-shadow: 0 8px 24px rgba(0,0,0,.5);
-  z-index: 1001;
-  opacity: 0;
-  transform: translateX(400px);
-  transition: all .3s cubic-bezier(.2,.9,.3,1);
-  max-width: 300px;
+.toast{ /* Toast notification container */
+  position: fixed; /* Fixed to viewport */
+  top: 20px; /* 20px from top */
+  right: 20px; /* 20px from right */
+  background: var(--card); /* Card background */
+  color: var(--text); /* Text color */
+  padding: 12px 20px; /* Padding inside toast */
+  border-radius: 6px; /* Rounded corners */
+  border: 1px solid rgba(6,182,212,0.3); /* Accent border */
+  box-shadow: 0 8px 24px rgba(0,0,0,.5); /* Drop shadow */
+  z-index: 1001; /* Above everything else */
+  opacity: 0; /* Initially invisible */
+  transform: translateX(400px); /* Initially off-screen to the right */
+  transition: all .3s cubic-bezier(.2,.9,.3,1); /* Smooth slide-in animation */
+  max-width: 300px; /* Limits toast width */
 }
-.toast.show{
-  opacity: 1;
-  transform: translateX(0);
+.toast.show{ /* Toast visible state */
+  opacity: 1; /* Fully visible */
+  transform: translateX(0); /* Slides into view */
 }
 
 /* Welcome Button - modern clean style */
-.welcome-btn{
-  background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%);
-  color: #fff;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all .2s ease;
-  box-shadow: 0 4px 12px rgba(6,182,212,.2);
-  margin-top: 12px;
+.welcome-btn{ /* Welcome button styles */
+  background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%); /* Gradient background (cyan to teal) */
+  color: #fff; /* White text */
+  border: none; /* No border */
+  padding: 10px 24px; /* Padding inside button */
+  border-radius: 6px; /* Rounded corners */
+  font-size: 0.95rem; /* Font size */
+  font-weight: 500; /* Medium font weight */
+  cursor: pointer; /* Pointer cursor */
+  transition: all .2s ease; /* Smooth transitions */
+  box-shadow: 0 4px 12px rgba(6,182,212,.2); /* Drop shadow */
+  margin-top: 12px; /* Space above button */
 }
-.welcome-btn:hover{
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(6,182,212,.35);
-  background: linear-gradient(135deg, #0891b2 0%, var(--accent) 100%);
+.welcome-btn:hover{ /* Hover state */
+  transform: translateY(-2px); /* Lifts button up */
+  box-shadow: 0 6px 20px rgba(6,182,212,.35); /* Enhanced shadow */
+  background: linear-gradient(135deg, #0891b2 0%, var(--accent) 100%); /* Reversed gradient */
 }
-.welcome-btn:active{
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(6,182,212,.25);
+.welcome-btn:active{ /* Active/pressed state */
+  transform: translateY(0); /* Returns to original position */
+  box-shadow: 0 2px 8px rgba(6,182,212,.25); /* Reduced shadow */
 }
-  </style>
-</head>
-<body>
-  <header class="site-header">
-    <h1>My Gallery</h1>
-    <p style="opacity:.85">Click a thumbnail to view, use ← → or Esc to navigate/close</p>
-    <button id="welcomeBtn" class="welcome-btn">Welcome</button>
-  </header>
+  </style> <!-- Closes style tag -->
+</head> <!-- Closes head section -->
+<body> <!-- Opens body section -->
+  <header class="site-header"> <!-- Main header element -->
+    <h1>My Gallery</h1> <!-- Main heading -->
+    <p style="opacity:.85">Click a thumbnail to view, use ← → or Esc to navigate/close</p> <!-- Instructions paragraph -->
+    <button id="welcomeBtn" class="welcome-btn">Welcome</button> <!-- Welcome button element -->
+  </header> <!-- Closes header -->
 
-  <main>
-    <section id="gallery" class="gallery" aria-live="polite"></section>
-  </main>
+  <main> <!-- Main content area -->
+    <section id="gallery" class="gallery" aria-live="polite"></section> <!-- Gallery container (populated by JavaScript) -->
+  </main> <!-- Closes main -->
 
-  <footer style="text-align:center; padding:24px 0; margin-top:48px; opacity:.6; font-size:.9rem">
-    Made with ♥ by Muhammad Harith
-  </footer>
+  <footer style="text-align:center; padding:24px 0; margin-top:48px; opacity:.6; font-size:.9rem"> <!-- Footer element -->
+    Made with ♥ by Muhammad Harith <!-- Footer text with heart symbol -->
+  </footer> <!-- Closes footer -->
 
-  <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Image viewer">
-    <button id="closeBtn" class="lb-close" aria-label="Close viewer">&times;</button>
-    <button id="prevBtn" class="lb-nav lb-prev" aria-label="Previous image">&#x2039;</button>
-    <div class="lb-content">
-      <img id="lightboxImage" src="" alt="" />
-      <p id="lightboxCaption" class="caption"></p>
-    </div>
-    <button id="nextBtn" class="lb-nav lb-next" aria-label="Next image">&#x203A;</button>
-  </div>
+  <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Image viewer"> <!-- Lightbox overlay container -->
+    <button id="closeBtn" class="lb-close" aria-label="Close viewer">&times;</button> <!-- Close button (× symbol) -->
+    <button id="prevBtn" class="lb-nav lb-prev" aria-label="Previous image">&#x2039;</button> <!-- Previous button (‹ symbol) -->
+    <div class="lb-content"> <!-- Lightbox content wrapper -->
+      <img id="lightboxImage" src="" alt="" /> <!-- Large image display -->
+      <p id="lightboxCaption" class="caption"></p> <!-- Image caption -->
+    </div> <!-- Closes content wrapper -->
+    <button id="nextBtn" class="lb-nav lb-next" aria-label="Next image">&#x203A;</button> <!-- Next button (› symbol) -->
+  </div> <!-- Closes lightbox -->
 
   <!-- Easter Egg Button -->
-  <button id="easterEggBtn" class="easter-egg-btn" aria-label="Mystery button" title="Click me... if you dare">
-    ?
-  </button>
+  <button id="easterEggBtn" class="easter-egg-btn" aria-label="Mystery button" title="Click me... if you dare"> <!-- Easter egg button -->
+    ? <!-- Question mark text -->
+  </button> <!-- Closes button -->
 
   <!-- Toast notification -->
-  <div id="toast" class="toast"></div>
+  <div id="toast" class="toast"></div> <!-- Toast notification container (populated by JavaScript) -->
 
   <!-- Easter Egg just above final html tag -->
-  <easter-egg="Harith was here 2026"></easter-egg>
+  <easter-egg="Harith was here 2026"></easter-egg> <!-- Easter egg HTML comment tag -->
 
-  <script>
+  <script> <!-- JavaScript section begins -->
     // --- CONFIG: put your filenames here (files must be in images/ folder) ---
-    const images = [
-      "bird.jpg",
-      "Deer.jpg",
-      "hippopotamus.jpg",
-      "raccoon.jpg",
-      "wolf.jpg",
-      "zebra.jpg"
-    ];
+    const images = [ // Array of image filenames to display in gallery
+      "bird.jpg", // First image filename
+      "Deer.jpg", // Second image filename
+      "hippopotamus.jpg", // Third image filename
+      "raccoon.jpg", // Fourth image filename
+      "wolf.jpg", // Fifth image filename
+      "zebra.jpg" // Sixth image filename
+    ]; // Closes array
     // ----------------------------------------------------------------------
 
-    const IMAGE_BASE = 'images/'; // folder where images are stored
-    let currentIndex = -1;
+    const IMAGE_BASE = 'images/'; // Base path for image files
+    let currentIndex = -1; // Tracks currently displayed image in lightbox (-1 means none)
 
-    const galleryEl = document.getElementById('gallery');
-    const lightbox = document.getElementById('lightbox');
-    const lbImage = document.getElementById('lightboxImage');
-    const lbCaption = document.getElementById('lightboxCaption');
-    const closeBtn = document.getElementById('closeBtn');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
+    const galleryEl = document.getElementById('gallery'); // Gets gallery container element
+    const lightbox = document.getElementById('lightbox'); // Gets lightbox overlay element
+    const lbImage = document.getElementById('lightboxImage'); // Gets lightbox image element
+    const lbCaption = document.getElementById('lightboxCaption'); // Gets lightbox caption element
+    const closeBtn = document.getElementById('closeBtn'); // Gets close button element
+    const prevBtn = document.getElementById('prevBtn'); // Gets previous button element
+    const nextBtn = document.getElementById('nextBtn'); // Gets next button element
 
-    function buildGallery(){
-      galleryEl.innerHTML = '';
-      if(images.length === 0){
-        galleryEl.innerHTML = '<p style="text-align:center;opacity:.8">No images. Add files to the images/ folder and update the images array.</p>';
-        return;
-      }
-      images.forEach((name, idx) => {
-        const card = document.createElement('button');
-        card.className = 'card';
-        card.type = 'button';
-        card.setAttribute('aria-label', `Open ${name}`);
-        card.addEventListener('click', () => openLightbox(idx));
+    function buildGallery(){ // Function to build gallery grid from images array
+      galleryEl.innerHTML = ''; // Clears any existing gallery content
+      if(images.length === 0){ // Checks if images array is empty
+        galleryEl.innerHTML = '<p style="text-align:center;opacity:.8">No images. Add files to the images/ folder and update the images array.</p>'; // Displays message if no images
+        return; // Exits function early
+      } // Closes if statement
+      images.forEach((name, idx) => { // Loops through each image in array
+        const card = document.createElement('button'); // Creates button element for card
+        card.className = 'card'; // Adds 'card' CSS class
+        card.type = 'button'; // Sets button type
+        card.setAttribute('aria-label', `Open ${name}`); // Sets accessibility label
+        card.addEventListener('click', () => openLightbox(idx)); // Adds click handler to open lightbox
 
-        const img = document.createElement('img');
-        img.src = IMAGE_BASE + name;
-        img.alt = name;
-        img.loading = 'lazy';
+        const img = document.createElement('img'); // Creates img element
+        img.src = IMAGE_BASE + name; // Sets image source path
+        img.alt = name; // Sets alt text for accessibility
+        img.loading = 'lazy'; // Enables lazy loading for performance
 
-        const meta = document.createElement('div');
-        meta.className = 'meta';
-        meta.innerHTML = '<span>' + name + '</span><span style="opacity:.8">' + (idx+1) + '/' + images.length + '</span>';
+        const meta = document.createElement('div'); // Creates metadata div
+        meta.className = 'meta'; // Adds 'meta' CSS class
+        meta.innerHTML = '<span>' + name + '</span><span style="opacity:.8">' + (idx+1) + '/' + images.length + '</span>'; // Sets metadata content (filename and position)
 
-        card.appendChild(img);
-        card.appendChild(meta);
-        galleryEl.appendChild(card);
-      });
-    }
+        card.appendChild(img); // Adds image to card
+        card.appendChild(meta); // Adds metadata to card
+        galleryEl.appendChild(card); // Adds card to gallery
+      }); // Closes forEach loop
+    } // Closes buildGallery function
 
-    function openLightbox(index){
-      if(index < 0 || index >= images.length) return;
-      currentIndex = index;
-      const src = IMAGE_BASE + images[index];
-      lbImage.src = src;
-      lbImage.alt = images[index];
-      lbCaption.textContent = images[index];
-      lightbox.setAttribute('aria-hidden','false');
-      document.body.style.overflow = 'hidden';
-    }
+    function openLightbox(index){ // Function to open lightbox with specific image
+      if(index < 0 || index >= images.length) return; // Validates index is within array bounds
+      currentIndex = index; // Sets current image index
+      const src = IMAGE_BASE + images[index]; // Builds full image path
+      lbImage.src = src; // Sets lightbox image source
+      lbImage.alt = images[index]; // Sets lightbox image alt text
+      lbCaption.textContent = images[index]; // Sets lightbox caption text
+      lightbox.setAttribute('aria-hidden','false'); // Shows lightbox (for accessibility)
+      document.body.style.overflow = 'hidden'; // Prevents background scrolling
+    } // Closes openLightbox function
 
-    function closeLightbox(){
-      lightbox.setAttribute('aria-hidden','true');
-      lbImage.src = '';
-      document.body.style.overflow = '';
-      currentIndex = -1;
-    }
+    function closeLightbox(){ // Function to close lightbox
+      lightbox.setAttribute('aria-hidden','true'); // Hides lightbox (for accessibility)
+      lbImage.src = ''; // Clears image source
+      document.body.style.overflow = ''; // Restores background scrolling
+      currentIndex = -1; // Resets current index
+    } // Closes closeLightbox function
 
-    function showNext(dir = 1){
-      if(images.length === 0) return;
-      currentIndex = (currentIndex + dir + images.length) % images.length;
-      openLightbox(currentIndex);
-    }
+    function showNext(dir = 1){ // Function to navigate to next/previous image (default: next)
+      if(images.length === 0) return; // Exits if no images
+      currentIndex = (currentIndex + dir + images.length) % images.length; // Calculates next index with wraparound
+      openLightbox(currentIndex); // Opens lightbox with new image
+    } // Closes showNext function
 
     // events
-    closeBtn.addEventListener('click', closeLightbox);
-    prevBtn.addEventListener('click', () => showNext(-1));
-    nextBtn.addEventListener('click', () => showNext(1));
-    window.addEventListener('keydown', (e) => {
-      if(lightbox.getAttribute('aria-hidden') === 'false'){
-        if(e.key === 'Escape') closeLightbox();
-        if(e.key === 'ArrowLeft') showNext(-1);
-        if(e.key === 'ArrowRight') showNext(1);
-      }
-    });
-    lightbox.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); });
+    closeBtn.addEventListener('click', closeLightbox); // Adds click handler to close button
+    prevBtn.addEventListener('click', () => showNext(-1)); // Adds click handler to previous button (goes back)
+    nextBtn.addEventListener('click', () => showNext(1)); // Adds click handler to next button (goes forward)
+    window.addEventListener('keydown', (e) => { // Adds keyboard event listener
+      if(lightbox.getAttribute('aria-hidden') === 'false'){ // Checks if lightbox is open
+        if(e.key === 'Escape') closeLightbox(); // Closes lightbox on Escape key
+        if(e.key === 'ArrowLeft') showNext(-1); // Goes to previous image on Left Arrow
+        if(e.key === 'ArrowRight') showNext(1); // Goes to next image on Right Arrow
+      } // Closes if statement
+    }); // Closes event listener
+    lightbox.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); }); // Closes lightbox when clicking outside image
 
     // init
-    buildGallery();
+    buildGallery(); // Calls function to build gallery on page load
 
     // Easter Egg Button Logic
-    const easterEggBtn = document.getElementById('easterEggBtn');
-    const toast = document.getElementById('toast');
+    const easterEggBtn = document.getElementById('easterEggBtn'); // Gets easter egg button element
+    const toast = document.getElementById('toast'); // Gets toast notification element
     
-    const messages = [
-      "You clicked a button that does literally nothing. Congrats.",
-      "Still here? This button has no purpose.",
-      "Why do you keep clicking? There's no reward.",
-      "This is a test feature. It's testing your patience.",
-      "Fun fact: This button was made to test CI/CD pipelines.",
-      "Another click, another disappointment.",
-      "At least the animation is smooth, right?",
-      "The pipeline works! This button? Not so much.",
-      "Made with a concerning amount of caffeine ☕",
-      "Harith was here. Now you're here. We're all here."
-    ];
+    const messages = [ // Array of sarcastic messages for easter egg
+      "You clicked a button that does literally nothing. Congrats.", // Message 1
+      "Still here? This button has no purpose.", // Message 2
+      "Why do you keep clicking? There's no reward.", // Message 3
+      "This is a test feature. It's testing your patience.", // Message 4
+      "Fun fact: This button was made to test CI/CD pipelines.", // Message 5
+      "Another click, another disappointment.", // Message 6
+      "At least the animation is smooth, right?", // Message 7
+      "The pipeline works! This button? Not so much.", // Message 8
+      "Made with a concerning amount of caffeine ☕", // Message 9
+      "Harith was here. Now you're here. We're all here." // Message 10
+    ]; // Closes array
     
-    let clickCount = 0;
+    let clickCount = 0; // Tracks number of easter egg button clicks
     
-    function showToast(message){
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
+    function showToast(message){ // Function to display toast notification
+      toast.textContent = message; // Sets toast message text
+      toast.classList.add('show'); // Adds 'show' class to trigger slide-in animation
+      setTimeout(() => { // Sets timer for auto-dismiss
+        toast.classList.remove('show'); // Removes 'show' class to trigger slide-out animation
+      }, 3000); // Waits 3000 milliseconds (3 seconds)
+    } // Closes showToast function
     
-    easterEggBtn.addEventListener('click', () => {
-      clickCount++;
-      const message = messages[Math.floor(Math.random() * messages.length)];
-      showToast(message);
+    easterEggBtn.addEventListener('click', () => { // Adds click handler to easter egg button
+      clickCount++; // Increments click counter
+      const message = messages[Math.floor(Math.random() * messages.length)]; // Selects random message from array
+      showToast(message); // Displays toast with selected message
       
       // Log to console for the curious
-      console.log(`[$(date -Iseconds)] [EasterEgg] [INFO] Button clicked ${clickCount} time(s) - User has too much free time`);
-    });
+      console.log(`[$(date -Iseconds)] [EasterEgg] [INFO] Button clicked ${clickCount} time(s) - User has too much free time`); // Logs click to browser console
+    }); // Closes event listener
 
     // Welcome Button Logic - actually useful for once
-    const welcomeBtn = document.getElementById('welcomeBtn');
-    let welcomeClickCount = 0;
+    const welcomeBtn = document.getElementById('welcomeBtn'); // Gets welcome button element
+    let welcomeClickCount = 0; // Tracks number of welcome button clicks
     
-    welcomeBtn.addEventListener('click', () => {
-      welcomeClickCount++;
-      const welcomeMessage = `Welcome to the Web App Gallery! You've clicked this ${welcomeClickCount} time(s). Enjoy browsing ${images.length} amazing images.`;
-      showToast(welcomeMessage);
+    welcomeBtn.addEventListener('click', () => { // Adds click handler to welcome button
+      welcomeClickCount++; // Increments click counter
+      const welcomeMessage = `Welcome to the Web App Gallery! You've clicked this ${welcomeClickCount} time(s). Enjoy browsing ${images.length} amazing images.`; // Creates personalized welcome message
+      showToast(welcomeMessage); // Displays toast with welcome message
       
       // Log with proper format as per user rules
-      const now = new Date().toISOString();
-      console.log(`[${now}] [WelcomeButton] [INFO] Welcome button clicked - Click count: ${welcomeClickCount} - Gallery has ${images.length} images`);
-    });
-  </script>
-</body>
-</html>
+      const now = new Date().toISOString(); // Gets current timestamp in ISO format
+      console.log(`[${now}] [WelcomeButton] [INFO] Welcome button clicked - Click count: ${welcomeClickCount} - Gallery has ${images.length} images`); // Logs click with proper formatting
+    }); // Closes event listener
+  </script> <!-- Closes script tag -->
+</body> <!-- Closes body -->
+</html> <!-- Closes html -->

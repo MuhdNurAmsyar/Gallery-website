@@ -49,6 +49,38 @@ npm run docker:compose:down  # Stop services
 npm test
 ```
 
+## 🎤 Demo Resources (For Presentations)
+
+For live demonstrations and presentations, we provide comprehensive demo resources:
+
+- **[DEMO-COMMANDS.md](DEMO-COMMANDS.md)** - Complete command reference with explanations for every functionality
+- **[demo-presentation.ps1](demo-presentation.ps1)** - Automated PowerShell script that runs full demo sequence
+- **[QUICK-REFERENCE-CARD.md](QUICK-REFERENCE-CARD.md)** - Condensed quick reference for easy access during demos
+
+### Running Automated Demo
+
+```powershell
+# Run full automated demo (recommended for practice)
+.\demo-presentation.ps1
+
+# Cleanup before demo
+.\demo-presentation.ps1 -CleanupOnly
+
+# Skip tests (for time-saving during repeated demos)
+.\demo-presentation.ps1 -SkipTests
+
+# Skip Docker (for testing-only demo)
+.\demo-presentation.ps1 -SkipDocker
+```
+
+The demo script will guide you through:
+1. Running test suite
+2. Building Docker image
+3. Running single container
+4. Demonstrating Docker Compose
+5. Explaining CI/CD pipeline
+6. Opening browser for live demo
+
 ## 📁 Project Structure
 
 ```
