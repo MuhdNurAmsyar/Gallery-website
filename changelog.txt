@@ -1,3 +1,24 @@
+-0.1.7- Change 2026-02-02T01:30:00Z -
++ : added images.json.info - Documentation file with developer attribution for images.json (Amsyar)
+? : updated index.html (header comment:1-4) - Added developer attribution comment for Amsyar
+? : updated js_script.js (header comment:1-4) - Added developer attribution comment for Amsyar
+? : updated css_styles.css (header comment:1-4) - Added developer attribution comment for Amsyar
+? : updated tests/test-gallery.js (header:3) - Added test case developer attribution for Amsyar
+? : updated Dockerfile (header:3) - Added DevOps/Infrastructure developer attribution for Harith
+? : updated .github/workflows/ci-cd-pipeline.yml (header:3-4) - Added pipeline developer (Harith) and application developer (Amsyar) attributions
+? : updated docker-compose.yml (header:3) - Added DevOps/Infrastructure developer attribution for Harith
+? : updated .dockerignore (header:3) - Added DevOps/Infrastructure developer attribution for Harith
+? : updated package.json (comment:2) - Added developer attribution for both Amsyar (Application) and Harith (DevOps)
+
+-0.1.6- Change 2026-02-02T00:00:00Z -
++ : added FEATURE-WELCOME-BUTTON.md - Comprehensive documentation for welcome button feature
++ : added FEATURE-WELCOME-SUMMARY.md - Quick visual summary of welcome button implementation
++ : added index.html (lines 280-290, 296-307, 448-460) - Added welcome button feature with toast notification
++ : added index.html (styles 260-279) - Added CSS styling for welcome button with modern gradient design
++ : added tests/test-gallery.js (test 11) - Added validation test for welcome button existence and structure
+? : updated index.html (script) - Added event listener for welcome button with proper logging format
+? : updated README.md (features section) - Added welcome button and easter egg to features list
+
 -0.1.5- Change 2026-01-31T14:00:00Z -
 + : added PRESENTATION-UPDATE-SUMMARY.md - Detailed summary of all updates made to presentation outline
 + : added FEATURE-EASTER-EGG.md - Documentation for easter egg button feature and pipeline testing strategy

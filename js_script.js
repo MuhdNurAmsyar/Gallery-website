@@ -1,3 +1,8 @@
+// ---
+// Web Application JavaScript - Gallery Script
+// Developer: Amsyar
+// ---
+
 // Simple gallery script
 // By default this script fetches images.json and builds the gallery.
 // Put your image files in the images/ folder and list them in images.json,

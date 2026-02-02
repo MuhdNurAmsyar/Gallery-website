@@ -1,4 +1,5 @@
 {
+  "_comment": "Gallery Website Package - Application: Amsyar | DevOps: Harith",
   "name": "gallery-website",
   "version": "0.1.0",
   "description": "Simple gallery website with CI/CD pipeline",

@@ -5,6 +5,8 @@ A modern, containerized static gallery website with automated testing and deploy
 ## 🎯 Features
 
 - **Responsive Gallery**: Grid-based image gallery with lightbox functionality
+- **Welcome Button**: Interactive welcome button that greets users and tracks engagement
+- **Easter Egg**: Hidden feature button for testing and entertainment
 - **Containerized**: Fully Dockerized with nginx alpine for minimal footprint
 - **CI/CD Pipeline**: Automated testing, building, security scanning, and deployment
 - **Health Monitoring**: Built-in health check endpoints for orchestration

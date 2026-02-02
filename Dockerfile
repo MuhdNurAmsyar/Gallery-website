@@ -1,5 +1,6 @@
 # ---
 # The Voices In My Head Media Group - Gallery Website Dockerfile
+# DevOps/Infrastructure Developer: Harith
 # Made with a redbull fueled rage by Muhammad Harith
 # Version 0.1.0 - 2026-01-26
 # ---

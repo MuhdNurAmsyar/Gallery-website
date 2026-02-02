@@ -1,5 +1,6 @@
 // ---
 // The Voices In My Head Media Group - Gallery Tests
+// Test Case Developer: Amsyar
 // Made with a redbull fueled rage by Muhammad Harith
 // Version 0.1.0 - 2026-01-26
 // ---
@@ -178,6 +179,23 @@ function testReadmeExists() {
     assert(exists, 'README.md documentation exists');
 }
 
+// Test 11: Check for Welcome Button in index.html
+function testWelcomeButtonExists() {
+    const filePath = path.join(__dirname, '..', 'index.html');
+    try {
+        const content = fs.readFileSync(filePath, 'utf8');
+        const hasWelcomeBtn = content.includes('id="welcomeBtn"');
+        const hasWelcomeClass = content.includes('class="welcome-btn"');
+        const hasWelcomeScript = content.includes('welcomeBtn.addEventListener');
+        
+        assert(hasWelcomeBtn && hasWelcomeClass && hasWelcomeScript, 
+            'Welcome button exists with proper HTML structure and event listeners');
+    } catch (error) {
+        log('ERROR', 'TestRunner', `Failed to check welcome button: ${error.message}`);
+        assert(false, 'Welcome button exists');
+    }
+}
+
 // Run all tests
 function runAllTests() {
     log('INFO', 'TestRunner', 'Starting test suite execution');
@@ -192,6 +210,7 @@ function runAllTests() {
     testDockerfileExists();
     testJsSyntaxValid();
     testReadmeExists();
+    testWelcomeButtonExists();
     
     // Print summary
     const total = passCount + failCount;
