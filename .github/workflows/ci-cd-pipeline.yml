@@ -7,228 +7,406 @@
 # ---
 
 name: Gallery Website CI/CD Pipeline
+# Defines the workflow name displayed in GitHub Actions UI
 
 on:
+  # Specifies events that trigger this workflow
   push:
+    # Triggers on push events to specified branches
     branches:
+      # List of branches that trigger the workflow on push
       - main
+      # Main production branch
       - master
+      # Alternative main branch name
       - develop
+      # Development branch for testing
   pull_request:
+    # Triggers on pull request events to specified branches
     branches:
+      # List of target branches for pull requests
       - main
+      # Pull requests targeting main branch
       - master
+      # Pull requests targeting master branch
   workflow_dispatch:
+    # Allows manual triggering from GitHub Actions UI
 
 env:
+  # Global environment variables available to all jobs
   IMAGE_NAME: gallery-website
+  # Docker image name used throughout pipeline
   REGISTRY: ghcr.io
+  # GitHub Container Registry URL
   NODE_VERSION: '18'
+  # Node.js version for test execution
 
 jobs:
+  # Defines all jobs in the pipeline workflow
   # Job 1: Run tests to validate the gallery structure
   test:
+    # Job identifier used for dependencies and references
     name: Run Tests
+    # Display name shown in GitHub Actions UI
     runs-on: ubuntu-latest
+    # Specifies runner operating system (latest Ubuntu)
     
     steps:
+      # Sequential steps executed in this job
       - name: Checkout code
+        # Step name displayed in logs
         uses: actions/checkout@v4
+        # Uses GitHub's checkout action (v4) to clone repository
       
       - name: Setup Node.js
+        # Prepares Node.js environment for running tests
         uses: actions/setup-node@v4
+        # Uses GitHub's Node.js setup action (v4)
         with:
+          # Configuration parameters for the action
           node-version: ${{ env.NODE_VERSION }}
+          # Sets Node.js version from environment variable
       
       - name: Run gallery validation tests
+        # Executes test suite to validate gallery functionality
         run: |
+          # Multi-line shell script block
           echo "[$(date -Iseconds)] [TestRunner] [INFO] Starting test execution"
+          # Logs test start with ISO timestamp and component name
           npm test
+          # Runs test script defined in package.json
       
       - name: Upload test results
+        # Saves test results as artifacts for later review
         if: always()
+        # Runs this step regardless of previous step success/failure
         uses: actions/upload-artifact@v4
+        # Uses GitHub's artifact upload action (v4)
         with:
+          # Configuration for artifact upload
           name: test-results
+          # Artifact name in GitHub Actions
           path: |
+            # Multi-line path specification
             tests/
+            # Uploads entire tests directory
             *.log
+            # Uploads all log files from root
           retention-days: 7
+          # Keeps artifacts for 7 days before automatic deletion
 
   # Job 2: Build and validate Docker image
   build:
+    # Job identifier for Docker image building
     name: Build Docker Image
+    # Display name in GitHub Actions UI
     runs-on: ubuntu-latest
+    # Uses latest Ubuntu runner
     needs: test
+    # Depends on 'test' job - only runs if test succeeds
     
     steps:
+      # Steps for building and testing Docker image
       - name: Checkout code
+        # Clones repository code
         uses: actions/checkout@v4
+        # Uses checkout action v4
       
       - name: Set up Docker Buildx
+        # Configures Docker Buildx for advanced build features
         uses: docker/setup-buildx-action@v3
+        # Uses Docker's Buildx setup action (v3)
       
       - name: Build Docker image
+        # Builds Docker image from Dockerfile
         run: |
+          # Shell script for building image
           echo "[$(date -Iseconds)] [DockerBuild] [INFO] Building Docker image"
+          # Logs build start with timestamp
           docker build -t ${{ env.IMAGE_NAME }}:latest .
+          # Builds image with tag from env variable, using current directory context
       
       - name: Test Docker image
+        # Validates Docker image works correctly
         run: |
+          # Multi-line script for container testing
           echo "[$(date -Iseconds)] [DockerTest] [INFO] Starting container for validation"
+          # Logs container start
           docker run -d --name test-container -p 8080:80 ${{ env.IMAGE_NAME }}:latest
+          # Runs container in detached mode, maps port 8080:80, names it test-container
           sleep 5
+          # Waits 5 seconds for container to fully start
           
           echo "[$(date -Iseconds)] [DockerTest] [INFO] Testing health endpoint"
+          # Logs health check test
           curl -f http://localhost:8080/health || exit 1
+          # Tests /health endpoint, fails pipeline if endpoint returns error
           
           echo "[$(date -Iseconds)] [DockerTest] [INFO] Testing main page"
+          # Logs main page test
           curl -f http://localhost:8080/ || exit 1
+          # Tests main page, fails pipeline if page returns error
           
           docker stop test-container
+          # Stops the test container
           docker rm test-container
+          # Removes the test container
           echo "[$(date -Iseconds)] [DockerTest] [INFO] Container validation successful"
+          # Logs successful validation
       
       - name: Save Docker image as artifact
+        # Exports Docker image to file for sharing between jobs
         run: |
+          # Shell command to save and compress image
           docker save ${{ env.IMAGE_NAME }}:latest | gzip > gallery-website-image.tar.gz
+          # Saves image to tar, compresses with gzip, outputs to file
       
       - name: Upload Docker image artifact
+        # Uploads compressed image as GitHub Actions artifact
         uses: actions/upload-artifact@v4
+        # Uses artifact upload action v4
         with:
+          # Upload configuration
           name: docker-image
+          # Artifact name for downloading in other jobs
           path: gallery-website-image.tar.gz
+          # Path to compressed image file
           retention-days: 7
+          # Keeps artifact for 7 days
 
   # Job 3: Security scan the Docker image
   security-scan:
+    # Job identifier for security scanning
     name: Security Scan
+    # Display name in UI
     runs-on: ubuntu-latest
+    # Uses latest Ubuntu runner
     needs: build
+    # Depends on 'build' job - runs after image is built
     permissions:
+      # Explicit permissions required for this job
       contents: read
+      # Permission to read repository contents
       security-events: write
+      # Permission to write security scan results
       actions: read
+      # Permission to read workflow artifacts
     
     steps:
+      # Steps for security scanning
       - name: Checkout code
+        # Clones repository (needed for some scan contexts)
         uses: actions/checkout@v4
+        # Uses checkout action v4
       
       - name: Download Docker image artifact
+        # Downloads image built in previous job
         uses: actions/download-artifact@v4
+        # Uses artifact download action v4
         with:
+          # Download configuration
           name: docker-image
+          # Name of artifact to download (matches upload name)
       
       - name: Load Docker image
+        # Imports Docker image from compressed file
         run: |
+          # Shell command to load image
           docker load < gallery-website-image.tar.gz
+          # Loads image from tar.gz file into Docker
       
       - name: Run Trivy vulnerability scanner
+        # Scans Docker image for security vulnerabilities
         uses: aquasecurity/trivy-action@master
+        # Uses Aqua Security's Trivy scanner action (master branch)
         with:
+          # Scanner configuration
           image-ref: ${{ env.IMAGE_NAME }}:latest
+          # Specifies which image to scan
           format: 'sarif'
+          # Output format: SARIF (Static Analysis Results Interchange Format)
           output: 'trivy-results.sarif'
+          # Output file name for scan results
           severity: 'CRITICAL,HIGH'
+          # Only reports CRITICAL and HIGH severity vulnerabilities
       
       - name: Upload Trivy results to GitHub Security
+        # Uploads scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
+        # Uses GitHub's CodeQL action for SARIF upload (v3)
         if: always()
+        # Runs even if scan found vulnerabilities
         continue-on-error: true
+        # Doesn't fail pipeline if upload fails
         with:
+          # Upload configuration
           sarif_file: 'trivy-results.sarif'
+          # Path to SARIF results file
 
   # Job 4: Push to GitHub Container Registry (only on main/master)
   push-registry:
+    # Job identifier for registry push
     name: Push to Registry
+    # Display name in UI
     runs-on: ubuntu-latest
+    # Uses latest Ubuntu runner
     needs: [build, security-scan]
+    # Depends on both 'build' and 'security-scan' jobs
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    # Conditional: only runs on push to main or master branches
     permissions:
+      # Required permissions for this job
       contents: read
+      # Permission to read repository
       packages: write
+      # Permission to push to GitHub Container Registry
     
     steps:
+      # Steps for pushing image to registry
       - name: Checkout code
+        # Clones repository
         uses: actions/checkout@v4
+        # Uses checkout action v4
       
       - name: Download Docker image artifact
+        # Downloads built image from artifacts
         uses: actions/download-artifact@v4
+        # Uses download action v4
         with:
+          # Download configuration
           name: docker-image
+          # Artifact name to download
       
       - name: Load Docker image
+        # Loads image into Docker from file
         run: |
+          # Shell command to load image
           docker load < gallery-website-image.tar.gz
+          # Imports image from compressed tar file
       
       - name: Log in to GitHub Container Registry
+        # Authenticates with GitHub Container Registry
         uses: docker/login-action@v3
+        # Uses Docker's login action (v3)
         with:
+          # Login configuration
           registry: ${{ env.REGISTRY }}
+          # Registry URL (ghcr.io)
           username: ${{ github.actor }}
+          # Uses GitHub username of person who triggered workflow
           password: ${{ secrets.GITHUB_TOKEN }}
+          # Uses automatically provided GitHub token for authentication
       
       - name: Tag and push Docker image
+        # Tags image with multiple tags and pushes to registry
         run: |
+          # Multi-line shell script for tagging and pushing
           echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging and pushing image for registry"
+          # Logs push operation start
           
           # Define image base name with lowercase repository owner (GitHub Container Registry requirement)
           REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          # Converts repository owner name to lowercase (GHCR requirement)
+          # Uses tr command to translate uppercase to lowercase
           IMAGE_BASE="${{ env.REGISTRY }}/${REPO_OWNER_LOWER}/${{ env.IMAGE_NAME }}"
+          # Constructs full image path: ghcr.io/owner/image-name
           
           # Tag with branch name
           BRANCH_TAG="${IMAGE_BASE}:${{ github.ref_name }}"
+          # Creates tag with branch name (e.g., ghcr.io/owner/image:main)
           echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging as $BRANCH_TAG"
+          # Logs branch tag
           docker tag ${{ env.IMAGE_NAME }}:latest "$BRANCH_TAG"
+          # Tags local image with branch tag
           docker push "$BRANCH_TAG"
+          # Pushes branch-tagged image to registry
           
           # Tag with commit SHA
           SHA_TAG="${IMAGE_BASE}:${{ github.ref_name }}-${{ github.sha }}"
+          # Creates tag with branch name and commit SHA (e.g., ghcr.io/owner/image:main-abc123)
           echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging as $SHA_TAG"
+          # Logs SHA tag
           docker tag ${{ env.IMAGE_NAME }}:latest "$SHA_TAG"
+          # Tags local image with SHA tag
           docker push "$SHA_TAG"
+          # Pushes SHA-tagged image to registry
           
           # Tag as latest (only if on default branch)
           if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            # Conditional: only tags as 'latest' if on main or master branch
             LATEST_TAG="${IMAGE_BASE}:latest"
+            # Creates 'latest' tag (e.g., ghcr.io/owner/image:latest)
             echo "[$(date -Iseconds)] [RegistryPush] [INFO] Tagging as $LATEST_TAG"
+            # Logs latest tag
             docker tag ${{ env.IMAGE_NAME }}:latest "$LATEST_TAG"
+            # Tags local image as 'latest'
             docker push "$LATEST_TAG"
+            # Pushes 'latest' tag to registry
           fi
+          # Closes if statement
           
           echo "[$(date -Iseconds)] [RegistryPush] [INFO] Push completed successfully"
+          # Logs successful completion
 
   # Job 5: Deploy (placeholder - customize based on your deployment target)
   deploy:
+    # Job identifier for deployment
     name: Deploy Application
+    # Display name in UI
     runs-on: ubuntu-latest
+    # Uses latest Ubuntu runner
     needs: push-registry
+    # Depends on 'push-registry' job - runs after image is pushed
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    # Conditional: only runs on push to main or master branches
     
     steps:
+      # Steps for deployment (placeholder implementation)
       - name: Checkout code
+        # Clones repository
         uses: actions/checkout@v4
+        # Uses checkout action v4
       
       - name: Deploy notification
+        # Logs deployment information and instructions
         run: |
+          # Multi-line shell script for deployment logging
           echo "[$(date -Iseconds)] [Deploy] [INFO] Deployment stage triggered"
+          # Logs deployment start
           REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          # Converts owner name to lowercase
           echo "[$(date -Iseconds)] [Deploy] [INFO] Image available at: ${{ env.REGISTRY }}/${REPO_OWNER_LOWER}/${{ env.IMAGE_NAME }}:latest"
+          # Logs full image URL in registry
           echo "[$(date -Iseconds)] [Deploy] [INFO] Configure your deployment target to pull this image"
+          # Logs instruction for deployment configuration
           
           # TODO: Add actual deployment steps here
+          # Placeholder comment for future deployment implementation
           # Examples:
           # - SSH to server and run docker-compose pull && docker-compose up -d
+          # Example: Deploy to remote server using docker-compose
           # - Update Kubernetes deployment
+          # Example: Deploy to Kubernetes cluster
           # - Deploy to cloud provider (AWS ECS, Azure Container Instances, etc.)
+          # Example: Deploy to cloud container services
           # - Use GitHub Pages for static hosting
+          # Example: Deploy static files to GitHub Pages
       
       - name: Deployment summary
+        # Creates summary in GitHub Actions UI
         run: |
+          # Multi-line shell script for summary creation
           REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          # Converts owner name to lowercase
           echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          # Adds markdown header to GitHub Actions summary
           echo "" >> $GITHUB_STEP_SUMMARY
+          # Adds blank line
           echo "✅ **Status**: Pipeline completed successfully" >> $GITHUB_STEP_SUMMARY
+          # Adds success status with checkmark emoji
           echo "📦 **Image**: \`${{ env.REGISTRY }}/${REPO_OWNER_LOWER}/${{ env.IMAGE_NAME }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          # Adds image URL in code formatting with package emoji
           echo "🔗 **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          # Adds commit SHA with link emoji
           echo "👤 **Triggered by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          # Adds triggering user with person emoji

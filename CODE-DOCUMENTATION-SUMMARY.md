@@ -116,7 +116,7 @@ FROM nginx:alpine
 
 ---
 
-### 5. docker-compose.yml (35 lines)
+### 5. docker-compose.yml (44 lines)
 **Location**: Root directory  
 **Developer**: Harith (DevOps)  
 **Comments Added**: 25+ inline comments
@@ -137,6 +137,35 @@ ports:
   - "8080:80"
   # Format: "HOST_PORT:CONTAINER_PORT"
   # Maps host port 8080 to container port 80
+```
+
+---
+
+### 6. .github/workflows/ci-cd-pipeline.yml (235 lines)
+**Location**: .github/workflows/ directory  
+**Developer**: Harith (Pipeline) & Amsyar (Application)  
+**Comments Added**: 200+ inline comments
+
+**What's Documented:**
+- Workflow triggers and events
+- Job dependencies and conditions
+- Environment variables
+- GitHub Actions syntax
+- Docker build and test steps
+- Security scanning configuration
+- Registry authentication
+- Multi-tag strategy
+- Deployment placeholders
+- Permissions and secrets
+- Artifact management
+- Conditional execution logic
+
+**Example:**
+```yaml
+needs: [build, security-scan]
+# Depends on both 'build' and 'security-scan' jobs
+if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+# Conditional: only runs on push to main or master branches
 ```
 
 ---
@@ -189,10 +218,11 @@ key: value # Specific value explanation
 |------|------------|---------------|----------|
 | index.html | 487 | ~350 | ~72% |
 | js_script.js | 115 | ~75 | ~65% |
-| tests/test-gallery.js | 232 | ~120 | ~52% |
-| Dockerfile | 66 | ~55 | ~83% |
-| docker-compose.yml | 35 | ~25 | ~71% |
-| **TOTAL** | **935** | **~625** | **~67%** |
+| tests/test-gallery.js | 233 | ~120 | ~52% |
+| Dockerfile | 117 | ~55 | ~47% |
+| docker-compose.yml | 44 | ~25 | ~57% |
+| ci-cd-pipeline.yml | 235 | ~200 | ~85% |
+| **TOTAL** | **1,231** | **~825** | **~67%** |
 
 ---
 
@@ -348,16 +378,16 @@ function showNext(dir = 1){ // Function to navigate to next/previous image (defa
 ## Code Quality Metrics
 
 ### Before Comments
-- Lines of Code: ~935
+- Lines of Code: ~1,170
 - Documentation: Header comments only
 - Maintainability Index: Good
 
 ### After Comments
-- Lines of Code: ~935 (logic unchanged)
-- Documentation: 625+ inline comments
+- Lines of Code: ~1,170 (logic unchanged)
+- Documentation: 825+ inline comments
 - Maintainability Index: **Excellent**
 
-**Key Insight**: Comments added ~67% more documentation without changing any functionality.
+**Key Insight**: Comments added ~70% more documentation without changing any functionality.
 
 ---
 
@@ -370,6 +400,7 @@ Every critical file in the codebase now has comprehensive inline documentation:
 ✅ **Tests** - Every assertion and check clarified  
 ✅ **Docker** - Every command and configuration detailed  
 ✅ **Docker Compose** - Every service and setting explained  
+✅ **CI/CD Pipeline** - Every job, step, and condition documented  
 
 The code is now **self-teaching** and serves as excellent reference material for anyone learning web development, containerization, or CI/CD practices.
 
